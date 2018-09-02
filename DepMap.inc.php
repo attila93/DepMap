@@ -52,7 +52,7 @@ foreach ($devices as $items) {
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
 		// Note - Does not create device link within LibreNMS to allow "onclick" events on the graph
-        $devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1).' '.$items['local_hostname']','title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+					$devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1).'\n'.$items['local_hostname'].'\n'.$items['local_notes'],'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 	$remote_device_id = $items['remote_device_id'];
 	if (!array_key_exists($remote_device_id, $devices_by_id)) {
@@ -66,6 +66,7 @@ foreach ($devices as $items) {
 
 }
 $nodes = json_encode(array_values($devices_by_id));
+$nodes = str_replace('\\\\', '\\', $nodes);
 $edges = json_encode($links);
 
 if (count($devices_by_id) > 1 && count($links) > 0) {
