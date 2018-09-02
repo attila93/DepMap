@@ -29,6 +29,8 @@ $devices = array();
                              `D1`.`sysName` AS `local_sysName`,
 			     `D1`.`purpose` AS `local_notes`,
 			     `D1`.`status` AS `local_status`,
+			     `D1`.`last_ping_timetaken` AS `local_ping`,
+			     
 			   
                              `M`.`parent_device_id` AS `remote_device_id`,
                              `D2`.`os` AS `remote_os`,
@@ -51,22 +53,58 @@ foreach ($devices as $items) {
     $local_device_id = $items['local_device_id'];
     if (!array_key_exists($local_device_id, $devices_by_id)) {
         $items['sysName'] = $items['local_sysName'];
-		// Note - Does not create device link within LibreNMS to allow "onclick" events on the graph
-					$devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1).'\n'.$items['local_hostname'].'\n'.$items['local_notes'],'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+	// Note - Does not create device link within LibreNMS to allow "onclick" events on the graph
+	if($items['local_status']!=1) {
+		$localcolor = '#ffdddd';
+	}
+	else {
+		$localcolor = 'rgba(151,194,252,1)';
+		
+	}
+
+	if($items['local_os']=="airos") {
+		$shape = "image";
+		$image = "/images/os/ubiquiti.svg";
+	}
+	elseif($items['local_os']=="routeros") {
+		$shape = "image";
+		$image = "/images/os/mikrotik.svg";
+	}
+	
+	elseif($items['local_os']=="linux") {
+		$shape = "image";
+		$image = "/images/os/linux.svg";
+	}	
+	elseif($items['local_os']=="airos-af") {
+		$shape = "image";
+		$image = "/images/os/ubiquiti.svg";
+	}	
+	else {
+		$shape = "box";
+		$image = "/images/os/ubiquti.svg";
+	}	
+
+
+
+
+
+
+					$devices_by_id[$local_device_id] = array('id'=>$local_device_id,'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1).'\n'.$items['local_hostname'].'\n'.$items['local_notes'],'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>$shape,'background'=>$localcolor,'image'=>$image);
     }
 	$remote_device_id = $items['remote_device_id'];
 	if (!array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
 		// Note - Does not create device link within LibreNMS to allow "onclick" events on the graph
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']).'\n'.$items['remote_hostname'].'\n'.$items['remote_notes'], 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1).'\n'.$items['remote_hostname'].'\n'.$items['remote_notes'],'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 	$width = 3;
 	// Add directed edge between Parent and Child device
-	$links[] = array('from'=>$items['remote_device_id'],'to'=>$items['local_device_id'],'title'=>"title",'width'=>$width,'arrows'=>"to");
+	$links[] = array('from'=>$items['remote_device_id'],'to'=>$items['local_device_id'],'title'=>"title",'width'=>$width,'arrows'=>"to",'label'=>''.$items['local_ping'].'ms');
 
 }
 $nodes = json_encode(array_values($devices_by_id));
 $nodes = str_replace('\\\\', '\\', $nodes);
+$nodes = str_replace('\\/', '/', $nodes);
 $edges = json_encode($links);
 
 if (count($devices_by_id) > 1 && count($links) > 0) {
@@ -97,10 +135,15 @@ echo $edges;
         edges: edges,
         stabilize: true
     };
+
+
     var options =  <?php echo $config['network_map_vis_options']; ?>;
+
     var network = new vis.Network(container, data, options);
     network.on('click', function (properties) {
+	window.location.href = "device/device="+properties.nodes
     });
+
 </script>
 
 <?php
