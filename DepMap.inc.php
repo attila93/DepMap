@@ -29,12 +29,14 @@ $devices = array();
                              `D1`.`sysName` AS `local_sysName`,
 			     `D1`.`purpose` AS `local_notes`,
 			     `D1`.`status` AS `local_status`,
+			     `D1`.`os` AS `local_os`,
                              `M`.`parent_device_id` AS `remote_device_id`,
                              `D2`.`os` AS `remote_os`,
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
 			     `D2`.`purpose` AS `remote_notes`,
-			     `D2`.`status` AS `remote_status`
+			     `D2`.`status` AS `remote_status`,
+			      `D2`.`os` AS `remote_os`
                       FROM `device_relationships` AS `M`
                              INNER JOIN `devices` AS `D1` ON `M`.`child_device_id`=`D1`.`device_id`
                              INNER JOIN `devices` AS `D2` ON `M`.`parent_device_id`=`D2`.`device_id`
