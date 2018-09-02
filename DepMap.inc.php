@@ -58,7 +58,7 @@ foreach ($devices as $items) {
 	if (!array_key_exists($remote_device_id, $devices_by_id)) {
         $items['sysName'] = $items['remote_sysName'];
 		// Note - Does not create device link within LibreNMS to allow "onclick" events on the graph
-        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
+        $devices_by_id[$remote_device_id] = array('id'=>$remote_device_id,'label'=>shorthost(format_hostname($items, $items['remote_hostname']).'\n'.$items['remote_hostname'].'\n'.$items['remote_notes'], 1),'title'=>generate_device_link($local_device, '', array(), '', '', '', 0),'shape'=>'box');
     }
 	$width = 3;
 	// Add directed edge between Parent and Child device
