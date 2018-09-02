@@ -34,7 +34,7 @@ $devices = array();
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
 			     `D2`.`purpose` AS `remote_notes`,
-			     `D2`.`status` AS `remote_status`,
+			     `D2`.`status` AS `remote_status`
                       FROM `device_relationships` AS `M`
                              INNER JOIN `devices` AS `D1` ON `M`.`child_device_id`=`D1`.`device_id`
                              INNER JOIN `devices` AS `D2` ON `M`.`parent_device_id`=`D2`.`device_id`
